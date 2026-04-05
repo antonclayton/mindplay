@@ -136,6 +136,68 @@ npm run dev
 4. Frontend includes token in `Authorization: Bearer <token>` header for protected routes
 5. Backend middleware verifies token before allowing access
 
+## User Flow
+
+### Getting Started
+
+1. **Landing Page** - Users arrive at the dashboard with options to login or register
+2. **Authentication** - Create an account or login with existing credentials
+3. **Dashboard** - After authentication, users see a welcome message and "Play" button
+
+### Lobby System
+
+The application uses a real-time WebSocket-based lobby system for multiplayer gameplay:
+
+#### Creating a Lobby
+
+1. Click the **"Play"** button from the dashboard
+2. On the lobby page, click **"Create Lobby"**
+3. A unique lobby code is generated (e.g., "ABC123")
+4. Share this code with a friend to invite them
+
+#### Lobby Privacy Settings
+
+- **Default Privacy**: All new lobbies are created as **private**
+- **Host Controls**: Only the lobby host can toggle privacy settings
+- **Privacy Toggle Button**: Located below the lobby description
+  - Shows "Make Public" when lobby is private
+  - Shows "Make Private" when lobby is public
+- **Status Indicator**: Displays current privacy status with color coding
+  - **Green**: "Lobby is currently Public" - visible in public lobby browser
+  - **Red**: "Lobby is currently Private" - hidden from public lobby browser
+
+#### Joining a Lobby
+
+**Option 1: Direct Join (Private or Public)**
+1. Enter the lobby code in the "Join a Lobby" box
+2. Click **"Join Lobby"**
+3. You'll be connected to the lobby immediately
+
+**Option 2: Public Lobby Browser**
+1. Scroll down to view the "Public Lobbies" section
+2. Browse available public lobbies showing:
+   - Lobby code
+   - Host username
+   - Current player count (X/2)
+3. Click **"Join"** on any available lobby
+4. Note: Full lobbies (2/2 players) are automatically hidden
+
+#### In the Lobby
+
+- **Player List**: Shows all connected players (max 2)
+- **Host Indicator**: The lobby creator is marked as "(Host)"
+- **Privacy Controls**: Host can toggle between public/private at any time
+- **Start Game**: Host can start the game when ready (feature in development)
+- **Leave Lobby**: Any player can leave the lobby at any time
+
+#### WebSocket Communication
+
+The lobby system uses WebSocket connections for real-time updates:
+- Instant player join/leave notifications
+- Live lobby privacy status changes
+- Automatic public lobby list refresh
+- Host migration on disconnect
+
 ## Testing
 
 See `backend/README.md` for detailed API testing instructions with Postman.
