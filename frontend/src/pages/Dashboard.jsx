@@ -10,7 +10,7 @@ export function Dashboard() {
     if (!user) {
       navigate('/login');
     } else {
-      alert('Game starting soon!');
+      navigate('/lobby');
     }
   };
 
