@@ -19,7 +19,7 @@ export function Dashboard() {
       <div style={styles.content}>
         <h1 style={styles.title}>MindPlay</h1>
         <p style={styles.subtitle}>
-          {user ? `Welcome back, ${user.username}!` : 'Test your mind. Challenge yourself.'}
+          {user ? `Welcome, ${user.username}!` : 'Test your mind. Challenge yourself.'}
         </p>
         <div style={styles.buttonContainer}>
           <Button onClick={handlePlay}>Play</Button>

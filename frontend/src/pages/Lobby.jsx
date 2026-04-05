@@ -8,6 +8,7 @@ export function Lobby() {
   const [players, setPlayers] = useState([]);
   const [lobbyId, setLobbyId] = useState(null);
   const [hostId, setHostId] = useState(null);
+  const [isPublic, setIsPublic] = useState(false);
   const [publicLobbies, setPublicLobbies] = useState([]);
   const [joinCode, setJoinCode] = useState('');
   const [error, setError] = useState('');
@@ -31,6 +32,7 @@ export function Lobby() {
           setLobbyId(message.lobbyId);
           setHostId(message.hostId);
           setPlayers(message.players);
+          setIsPublic(message.isPublic);
           break;
         case 'LOBBY_CREATED':
           setLobbyId(message.lobbyId);
@@ -81,6 +83,10 @@ export function Lobby() {
 
   const handleStartGame = () => {
     if (ws) ws.send(JSON.stringify({ type: 'START_GAME' }));
+  };
+
+  const handleTogglePrivacy = () => {
+    if (ws) ws.send(JSON.stringify({ type: 'TOGGLE_LOBBY_PRIVACY' }));
   };
 
   if (!lobbyId) {
@@ -143,6 +149,21 @@ export function Lobby() {
     <div style={styles.container}>
       <h1 style={styles.title}>Lobby Code: {lobbyId}</h1>
       <p style={styles.instructions}>Share this code with a friend.<br />The game starts when the lobby host presses "Start Game".</p>
+      
+      {isHost && (
+        <div style={styles.privacyContainer}>
+          <button onClick={handleTogglePrivacy} style={{...styles.button, ...styles.privacyButton}}>
+            Make {isPublic ? 'Private' : 'Public'}
+          </button>
+          <div style={{
+            ...styles.privacyStatus,
+            ...(isPublic ? styles.publicStatus : styles.privateStatus)
+          }}>
+            Lobby is currently {isPublic ? 'Public' : 'Private'}
+          </div>
+        </div>
+      )}
+
       <div style={styles.playerList}>
         <h2 style={styles.subtitle}>Players ({players.length}/2)</h2>
         {players.map((player) => (
@@ -191,6 +212,11 @@ const styles = {
   playerItem: { padding: '1rem', fontSize: '1.2rem', backgroundColor: '#2a2a2a', borderRadius: '8px', width: '100%' },
   controls: { display: 'flex', flexDirection: 'row', justifyContent: 'center', gap: '1rem', alignItems: 'center', marginTop: '2rem' },
   disabledButton: { backgroundColor: '#555', opacity: 0.6, cursor: 'not-allowed' },
+  privacyContainer: { display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '2rem' },
+  privacyButton: { backgroundColor: '#6a6a6a' },
+  privacyStatus: { marginTop: '0.5rem', fontStyle: 'italic', fontWeight: 'bold', fontSize: '1.1rem' },
+  publicStatus: { color: '#28a745' },
+  privateStatus: { color: '#c94c4c' },
   browserBox: { width: '100%', marginTop: '2rem' },
   lobbyList: { display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '300px', overflowY: 'auto', paddingRight: '1rem' },
   lobbyItem: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', backgroundColor: '#2a2a2a', borderRadius: '8px' },

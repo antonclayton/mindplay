@@ -21,7 +21,7 @@ function broadcastLobbyUpdate(lobbyId) {
   const lobby = lobbies.get(lobbyId);
   if (!lobby) return;
   const players = Array.from(lobby.players.values()).map(({ id, username }) => ({ id, username }));
-  broadcastToLobby(lobbyId, { type: 'LOBBY_UPDATE', lobbyId, hostId: lobby.hostId, players });
+  broadcastToLobby(lobbyId, { type: 'LOBBY_UPDATE', lobbyId, hostId: lobby.hostId, players, isPublic: lobby.isPublic });
 }
 
 function broadcastPublicLobbies(wss) {
@@ -61,7 +61,7 @@ function handleMessage(ws, message, wss) {
     switch (data.type) {
       case 'CREATE_LOBBY': {
         const lobbyId = generateLobbyCode();
-        const newLobby = { id: lobbyId, players: new Map(), hostId: ws.user.id, state: 'waiting', isPublic: true };
+        const newLobby = { id: lobbyId, players: new Map(), hostId: ws.user.id, state: 'waiting', isPublic: false };
         lobbies.set(lobbyId, newLobby);
         joinLobby(ws, lobbyId, wss);
         break;
@@ -72,6 +72,15 @@ function handleMessage(ws, message, wss) {
       case 'LEAVE_LOBBY':
         leaveLobby(ws, wss);
         break;
+      case 'TOGGLE_LOBBY_PRIVACY': {
+        const lobby = lobbies.get(ws.lobbyId);
+        if (lobby && lobby.hostId === ws.user.id) {
+          lobby.isPublic = !lobby.isPublic;
+          broadcastLobbyUpdate(ws.lobbyId);
+          broadcastPublicLobbies(wss);
+        }
+        break;
+      }
       case 'START_GAME': {
         const lobby = lobbies.get(ws.lobbyId);
         if (lobby && lobby.hostId === ws.user.id && lobby.players.size === 2) {
