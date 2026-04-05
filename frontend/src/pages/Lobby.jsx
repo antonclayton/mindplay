@@ -80,21 +80,34 @@ export function Lobby() {
   if (!lobbyId) {
     return (
       <div style={styles.container}>
-        <h1 style={styles.title}>Join or Create a Lobby</h1>
-        <div style={styles.actions}>
-          <button onClick={handleCreateLobby} style={styles.button}>
-            Create Lobby
-          </button>
-          <form onSubmit={handleJoinLobby} style={styles.joinForm}>
-            <input
-              type="text"
-              value={joinCode}
-              onChange={(e) => setJoinCode(e.target.value)}
-              placeholder="Enter Lobby Code"
-              style={styles.input}
-            />
-            <button type="submit" style={styles.button}>Join Lobby</button>
-          </form>
+        <div style={styles.contentWrapper}>
+          <h1 style={styles.title}>Join or Create a Lobby</h1>
+          <div style={styles.selectionContainer}>
+            {/* Create Lobby Box */}
+            <div style={styles.box}>
+              <h2 style={styles.boxTitle}>Create a Lobby</h2>
+              <p style={styles.boxDescription}>Start a new private lobby and invite a friend.</p>
+              <button onClick={handleCreateLobby} style={styles.button}>
+                Create Lobby
+              </button>
+            </div>
+
+            {/* Join Lobby Box */}
+            <div style={styles.box}>
+              <h2 style={styles.boxTitle}>Join a Lobby</h2>
+              <p style={styles.boxDescription}>Enter a code to join an existing lobby.</p>
+              <form onSubmit={handleJoinLobby} style={styles.joinForm}>
+                <input
+                  type="text"
+                  value={joinCode}
+                  onChange={(e) => setJoinCode(e.target.value)}
+                  placeholder="Enter Lobby Code"
+                  style={styles.input}
+                />
+                <button type="submit" style={styles.button}>Join Lobby</button>
+              </form>
+            </div>
+          </div>
           {error && <p style={styles.error}>{error}</p>}
         </div>
       </div>
@@ -106,7 +119,7 @@ export function Lobby() {
   return (
     <div style={styles.container}>
       <h1 style={styles.title}>Lobby Code: {lobbyId}</h1>
-      <p style={styles.instructions}>Share this code with a friend. The game starts when two players are in the lobby.</p>
+      <p style={styles.instructions}>Share this code with a friend.<br />The game starts when the lobby host presses "Start Game".</p>
       <div style={styles.playerList}>
         <h2 style={styles.subtitle}>Players ({players.length}/2)</h2>
         {players.map((player) => (
@@ -138,15 +151,18 @@ export function Lobby() {
 
 const styles = {
   container: { display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', minHeight: 'calc(100vh - 73px)', padding: '2rem', textAlign: 'center' },
-  contentWrapper: { maxWidth: '600px', width: '100%' },
-  title: { fontSize: '2.5rem', marginBottom: '1rem' },
-  subtitle: { fontSize: '1.5rem', marginBottom: '1rem', color: '#aaa' },
-  actions: { display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center', marginTop: '2rem' },
-  joinForm: { display: 'flex', gap: '0.5rem' },
+  contentWrapper: { maxWidth: '800px', width: '100%' },
+  title: { fontSize: '2.5rem', marginBottom: '2rem' },
+  selectionContainer: { display: 'flex', justifyContent: 'center', gap: '2rem', alignItems: 'stretch' },
+  box: { flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '2rem', backgroundColor: '#1a1a1a', borderRadius: '8px', border: '1px solid #333' },
+  boxTitle: { fontSize: '1.5rem', marginBottom: '0.5rem' },
+  boxDescription: { color: '#aaa', marginBottom: '1.5rem', flexGrow: 1 },
+  joinForm: { display: 'flex', flexDirection: 'column', gap: '1rem' },
   input: { padding: '0.75rem', fontSize: '1.1rem', backgroundColor: '#2a2a2a', border: '1px solid #444', borderRadius: '4px', color: '#fff' },
   button: { padding: '0.75rem 1.5rem', fontSize: '1.1rem', cursor: 'pointer', border: 'none', borderRadius: '4px', backgroundColor: '#4a90e2', color: '#fff' },
   leaveButton: { backgroundColor: '#c94c4c' },
-  error: { color: '#ff6b6b', marginTop: '1rem' },
+  error: { color: '#ff6b6b', marginTop: '1.5rem' },
+  subtitle: { fontSize: '1.5rem', marginBottom: '1rem', color: '#aaa' },
   instructions: { color: '#888', fontSize: '1rem', marginBottom: '2rem', marginTop: '-0.5rem' },
   playerList: { display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center', marginBottom: '2rem', width: '100%', maxWidth: '500px' },
   playerItem: { padding: '1rem', fontSize: '1.2rem', backgroundColor: '#2a2a2a', borderRadius: '8px', width: '100%' },
