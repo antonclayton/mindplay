@@ -8,6 +8,7 @@ export function Lobby() {
   const [players, setPlayers] = useState([]);
   const [lobbyId, setLobbyId] = useState(null);
   const [hostId, setHostId] = useState(null);
+  const [publicLobbies, setPublicLobbies] = useState([]);
   const [joinCode, setJoinCode] = useState('');
   const [error, setError] = useState('');
   const [ws, setWs] = useState(null);
@@ -34,6 +35,9 @@ export function Lobby() {
         case 'LOBBY_CREATED':
           setLobbyId(message.lobbyId);
           break;
+        case 'PUBLIC_LOBBIES_UPDATE':
+          setPublicLobbies(message.lobbies);
+          break;
         case 'LOBBY_CLOSED':
           alert(message.message);
           setLobbyId(null);
@@ -42,7 +46,6 @@ export function Lobby() {
           break;
         case 'GAME_STARTING':
           alert('The game is starting!');
-          // Future: navigate to game screen
           break;
         case 'ERROR':
           setError(message.message);
@@ -51,7 +54,6 @@ export function Lobby() {
     };
 
     setWs(socket);
-
     return () => socket.close();
   }, []);
 
@@ -59,11 +61,15 @@ export function Lobby() {
     if (ws) ws.send(JSON.stringify({ type: 'CREATE_LOBBY' }));
   };
 
-  const handleJoinLobby = (e) => {
-    e.preventDefault();
-    if (ws && joinCode) {
-      ws.send(JSON.stringify({ type: 'JOIN_LOBBY', lobbyId: joinCode.toUpperCase() }));
+  const handleJoinLobby = (lobbyIdToJoin) => {
+    if (ws && lobbyIdToJoin) {
+      ws.send(JSON.stringify({ type: 'JOIN_LOBBY', lobbyId: lobbyIdToJoin.toUpperCase() }));
     }
+  };
+
+  const handleJoinSubmit = (e) => {
+    e.preventDefault();
+    handleJoinLobby(joinCode);
   };
 
   const handleLeaveLobby = () => {
@@ -83,20 +89,15 @@ export function Lobby() {
         <div style={styles.contentWrapper}>
           <h1 style={styles.title}>Join or Create a Lobby</h1>
           <div style={styles.selectionContainer}>
-            {/* Create Lobby Box */}
             <div style={styles.box}>
               <h2 style={styles.boxTitle}>Create a Lobby</h2>
-              <p style={styles.boxDescription}>Start a new private lobby and invite a friend.</p>
-              <button onClick={handleCreateLobby} style={styles.button}>
-                Create Lobby
-              </button>
+              <p style={styles.boxDescription}>Start a new public lobby and invite a friend.</p>
+              <button onClick={handleCreateLobby} style={styles.button}>Create Lobby</button>
             </div>
-
-            {/* Join Lobby Box */}
             <div style={styles.box}>
               <h2 style={styles.boxTitle}>Join a Lobby</h2>
-              <p style={styles.boxDescription}>Enter a code to join an existing lobby.</p>
-              <form onSubmit={handleJoinLobby} style={styles.joinForm}>
+              <p style={styles.boxDescription}>Enter a code to join a specific lobby.</p>
+              <form onSubmit={handleJoinSubmit} style={styles.joinForm}>
                 <input
                   type="text"
                   value={joinCode}
@@ -109,6 +110,28 @@ export function Lobby() {
             </div>
           </div>
           {error && <p style={styles.error}>{error}</p>}
+
+          <div style={{...styles.box, ...styles.browserBox}}>
+            <h2 style={styles.boxTitle}>Public Lobbies</h2>
+            <div style={styles.lobbyList}>
+              {publicLobbies.length > 0 ? (
+                publicLobbies.map(lobby => (
+                  <div key={lobby.id} style={styles.lobbyItem}>
+                    <div style={styles.lobbyInfo}>
+                      <span style={styles.lobbyIdText}>Code: {lobby.id}</span>
+                      <span style={styles.hostName}>Host: {lobby.hostUsername}</span>
+                    </div>
+                    <div style={styles.lobbyActions}>
+                      <span style={styles.playerCount}>{lobby.playerCount}/2 Players</span>
+                      <button onClick={() => handleJoinLobby(lobby.id)} style={styles.joinButton}>Join</button>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p style={styles.boxDescription}>No public lobbies available. Create one!</p>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -150,10 +173,10 @@ export function Lobby() {
 }
 
 const styles = {
-  container: { display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', minHeight: 'calc(100vh - 73px)', padding: '2rem', textAlign: 'center' },
+  container: { display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', minHeight: 'calc(100vh - 73px)', padding: '2rem', paddingTop: '4rem', textAlign: 'center' },
   contentWrapper: { maxWidth: '800px', width: '100%' },
   title: { fontSize: '2.5rem', marginBottom: '2rem' },
-  selectionContainer: { display: 'flex', justifyContent: 'center', gap: '2rem', alignItems: 'stretch' },
+  selectionContainer: { display: 'flex', justifyContent: 'center', gap: '2rem', alignItems: 'stretch', marginBottom: '2rem' },
   box: { flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '2rem', backgroundColor: '#1a1a1a', borderRadius: '8px', border: '1px solid #333' },
   boxTitle: { fontSize: '1.5rem', marginBottom: '0.5rem' },
   boxDescription: { color: '#aaa', marginBottom: '1.5rem', flexGrow: 1 },
@@ -168,4 +191,13 @@ const styles = {
   playerItem: { padding: '1rem', fontSize: '1.2rem', backgroundColor: '#2a2a2a', borderRadius: '8px', width: '100%' },
   controls: { display: 'flex', flexDirection: 'row', justifyContent: 'center', gap: '1rem', alignItems: 'center', marginTop: '2rem' },
   disabledButton: { backgroundColor: '#555', opacity: 0.6, cursor: 'not-allowed' },
+  browserBox: { width: '100%', marginTop: '2rem' },
+  lobbyList: { display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '300px', overflowY: 'auto', paddingRight: '1rem' },
+  lobbyItem: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', backgroundColor: '#2a2a2a', borderRadius: '8px' },
+  lobbyInfo: { textAlign: 'left' },
+  lobbyIdText: { display: 'block', fontSize: '1.1rem', fontWeight: 'bold' },
+  hostName: { color: '#aaa', fontSize: '0.9rem' },
+  lobbyActions: { display: 'flex', alignItems: 'center', gap: '1rem' },
+  playerCount: { color: '#aaa', fontSize: '0.9rem' },
+  joinButton: { padding: '0.5rem 1rem', fontSize: '1rem', cursor: 'pointer', border: 'none', borderRadius: '4px', backgroundColor: '#3c82f6', color: '#fff' },
 };
