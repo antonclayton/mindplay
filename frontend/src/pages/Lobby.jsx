@@ -97,6 +97,7 @@ export function Lobby() {
       <div style={styles.container}>
         <div style={styles.contentWrapper}>
           {lobbyClosedMessage && <p style={styles.error}>{lobbyClosedMessage}</p>}
+          {error && <p style={styles.error}>{error}</p>}
           <h1 style={styles.title}>Join or Create a Lobby</h1>
           <div style={styles.selectionContainer}>
             <div style={styles.box}>
@@ -119,7 +120,6 @@ export function Lobby() {
               </form>
             </div>
           </div>
-          {error && <p style={styles.error}>{error}</p>}
 
           <div style={{...styles.box, ...styles.browserBox}}>
             <h2 style={styles.boxTitle}>Public Lobbies</h2>
@@ -209,7 +209,7 @@ const styles = {
   input: { padding: '0.75rem', fontSize: '1.1rem', backgroundColor: '#2a2a2a', border: '1px solid #444', borderRadius: '4px', color: '#fff' },
   button: { padding: '0.75rem 1.5rem', fontSize: '1.1rem', cursor: 'pointer', border: 'none', borderRadius: '4px', backgroundColor: '#4a90e2', color: '#fff' },
   leaveButton: { backgroundColor: '#c94c4c' },
-  error: { color: '#ff6b6b', marginTop: '1.5rem' },
+  error: { color: '#ff6b6b', marginTop: '1.5rem', fontWeight: 'bold'},
   subtitle: { fontSize: '1.5rem', marginBottom: '1rem', color: '#aaa' },
   instructions: { color: '#888', fontSize: '1rem', marginBottom: '2rem', marginTop: '-0.5rem' },
   playerList: { display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center', marginBottom: '2rem', width: '100%', maxWidth: '500px' },
