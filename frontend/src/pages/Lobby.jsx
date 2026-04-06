@@ -12,6 +12,7 @@ export function Lobby() {
   const [publicLobbies, setPublicLobbies] = useState([]);
   const [joinCode, setJoinCode] = useState('');
   const [error, setError] = useState('');
+  const [lobbyClosedMessage, setLobbyClosedMessage] = useState('');
   const [ws, setWs] = useState(null);
 
   useEffect(() => {
@@ -29,19 +30,21 @@ export function Lobby() {
 
       switch (message.type) {
         case 'LOBBY_UPDATE':
+          setLobbyClosedMessage('');
           setLobbyId(message.lobbyId);
           setHostId(message.hostId);
           setPlayers(message.players);
           setIsPublic(message.isPublic);
           break;
         case 'LOBBY_CREATED':
+          setLobbyClosedMessage('');
           setLobbyId(message.lobbyId);
           break;
         case 'PUBLIC_LOBBIES_UPDATE':
           setPublicLobbies(message.lobbies);
           break;
         case 'LOBBY_CLOSED':
-          alert(message.message);
+          setLobbyClosedMessage(message.message);
           setLobbyId(null);
           setHostId(null);
           setPlayers([]);
@@ -93,6 +96,7 @@ export function Lobby() {
     return (
       <div style={styles.container}>
         <div style={styles.contentWrapper}>
+          {lobbyClosedMessage && <p style={styles.error}>{lobbyClosedMessage}</p>}
           <h1 style={styles.title}>Join or Create a Lobby</h1>
           <div style={styles.selectionContainer}>
             <div style={styles.box}>
@@ -194,7 +198,7 @@ export function Lobby() {
 }
 
 const styles = {
-  container: { display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', minHeight: 'calc(100vh - 73px)', padding: '2rem', paddingTop: '4rem', textAlign: 'center' },
+  container: { display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', minHeight: 'calc(100vh - 73px)', padding: '2rem', paddingTop: '1.5rem', textAlign: 'center' },
   contentWrapper: { maxWidth: '800px', width: '100%' },
   title: { fontSize: '2.5rem', marginBottom: '2rem' },
   selectionContainer: { display: 'flex', justifyContent: 'center', gap: '2rem', alignItems: 'stretch', marginBottom: '2rem' },
