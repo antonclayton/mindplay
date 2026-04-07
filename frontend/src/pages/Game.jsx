@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import useGameStore from '../stores/gameStore';
+import { Button } from '../components/Button';
+import { MoveButton } from '../components/MoveButton';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -155,6 +157,7 @@ export function Game() {
     };
   }, [ws, navigate, resolveRound, endGame, addChatMessage, startNewGame, setOpponentStats, setOpponentLastMoves, setIsHost]);
 
+
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatMessages]);
@@ -282,16 +285,23 @@ export function Game() {
             Final Score: {myScore} - {opponentScore}
           </p>
           <div style={styles.gameOverButtons}>
-            <button 
+            <Button 
               onClick={handlePlayAgainRequest} 
               disabled={!isHost}
-              style={isHost ? styles.playAgainButton : styles.playAgainButtonDisabled}
+              variant="success"
+              fullWidth={false}
+              style={{ padding: '1rem 2rem', fontSize: '1.2rem' }}
             >
               Play Again
-            </button>
-            <button onClick={handlePlayAgain} style={styles.backToLobbyButton}>
+            </Button>
+            <Button 
+              onClick={handlePlayAgain} 
+              variant="secondary"
+              fullWidth={false}
+              style={{ padding: '1rem 2rem', fontSize: '1.2rem' }}
+            >
               Back to Lobby
-            </button>
+            </Button>
           </div>
           {!isHost && <p style={styles.playAgainHint}>Waiting for host to start a new game...</p>}
         </div>
@@ -310,12 +320,16 @@ export function Game() {
   return (
     <div style={styles.container}>
       <div style={styles.gameLayout}>
-        {/* Left: Opponent Data Card */}
-        <div style={styles.dataCard}>
-          <div style={styles.opponentNameBox}>
-            <span style={styles.opponentLabel}>OPPONENT</span>
-            <span style={styles.opponentName}>{opponent.username}</span>
-          </div>
+        {/* Left Column: Opponent Data Card + Leave Game */}
+        <div style={styles.leftColumn}>
+          <div style={styles.dataCard}>
+            <div style={styles.opponentHeader}>
+              <span style={styles.opponentHeaderIcon}>👤</span>
+              <span style={styles.opponentHeaderText}>OPPONENT INTEL</span>
+            </div>
+            <div style={styles.opponentNameBox}>
+              <span style={styles.opponentName}>{opponent.username}</span>
+            </div>
           
           <div style={styles.statsSection}>
             <h3 style={styles.sectionTitle}>Lifetime Throw %</h3>
@@ -394,9 +408,16 @@ export function Game() {
             )}
           </div>
 
-          <button onClick={handleLeaveGame} style={styles.leaveGameButton}>
-            Leave Game (Forfeit)
-          </button>
+          </div>
+
+          <div style={styles.leaveGameBox}>
+            <Button 
+              onClick={handleLeaveGame} 
+              variant="danger"
+            >
+              Leave Game (Forfeit)
+            </Button>
+          </div>
         </div>
 
         {/* Center: Game Area + Last 7 Moves */}
@@ -439,19 +460,14 @@ export function Game() {
                 </p>
                 <div style={styles.moves}>
                   {['rock', 'paper', 'scissors'].map((move) => (
-                    <button
+                    <MoveButton
                       key={move}
+                      move={move}
                       onClick={() => handleMove(move)}
                       disabled={waitingForOpponent}
-                      style={{
-                        ...styles.moveButton,
-                        ...(selectedMove === move ? styles.selectedMove : {}),
-                        ...(waitingForOpponent ? styles.disabledMove : {}),
-                      }}
-                    >
-                      <span style={styles.moveEmoji}>{getMoveEmoji(move)}</span>
-                      <span style={styles.moveName}>{move.charAt(0).toUpperCase() + move.slice(1)}</span>
-                    </button>
+                      selected={selectedMove === move}
+                      emoji={getMoveEmoji(move)}
+                    />
                   ))}
                 </div>
               </>
@@ -513,9 +529,14 @@ export function Game() {
               style={styles.chatInput}
               maxLength={500}
             />
-            <button type="submit" style={styles.chatSendButton}>
+            <Button 
+              type="submit" 
+              variant="primary"
+              fullWidth={false}
+              style={{ padding: '0.5rem 1rem', fontSize: '0.9rem' }}
+            >
               Send
-            </button>
+            </Button>
           </form>
         </div>
       </div>
@@ -537,27 +558,49 @@ const styles = {
     display: 'flex',
     gap: '1.5rem',
     width: '100%',
-    maxWidth: '1400px',
+  },
+  leftColumn: {
+    flex: '0 0 280px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '1rem',
     height: 'calc(100vh - 120px)',
   },
   dataCard: {
-    flex: '0 0 280px',
+    flex: 1,
     display: 'flex',
     flexDirection: 'column',
     backgroundColor: '#1a1a1a',
     borderRadius: '12px',
     padding: '1.5rem',
+    border: '2px solid #e74c3c',
+    boxShadow: '0 0 20px rgba(231, 76, 60, 0.15)',
+    overflow: 'auto',
+  },
+  leaveGameBox: {
+    backgroundColor: '#1a1a1a',
+    borderRadius: '12px',
+    padding: '1rem',
     border: '1px solid #333',
   },
-  leaveGameButton: {
-    marginTop: 'auto',
-    padding: '0.75rem 1rem',
-    fontSize: '0.9rem',
-    backgroundColor: '#dc3545',
-    border: 'none',
+  opponentHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '0.5rem',
+    padding: '0.75rem',
+    marginBottom: '1rem',
+    backgroundColor: '#e74c3c',
     borderRadius: '8px',
     color: '#fff',
-    cursor: 'pointer',
+  },
+  opponentHeaderIcon: {
+    fontSize: '1.2rem',
+  },
+  opponentHeaderText: {
+    fontSize: '0.85rem',
+    fontWeight: 'bold',
+    letterSpacing: '0.15rem',
   },
   opponentNameBox: {
     display: 'flex',
@@ -567,18 +610,12 @@ const styles = {
     marginBottom: '1.5rem',
     backgroundColor: '#2a2a2a',
     borderRadius: '8px',
-    border: '2px solid #e74c3c',
-  },
-  opponentLabel: {
-    fontSize: '0.7rem',
-    color: '#888',
-    letterSpacing: '0.1rem',
-    marginBottom: '0.25rem',
+    border: '1px solid #444',
   },
   opponentName: {
     fontSize: '1.4rem',
     fontWeight: 'bold',
-    color: '#e74c3c',
+    color: '#fff',
   },
   centerColumn: {
     flex: 1,
@@ -789,33 +826,6 @@ const styles = {
     gap: '1.5rem',
     marginBottom: '2rem',
   },
-  moveButton: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    padding: '1.5rem 2rem',
-    backgroundColor: '#2a2a2a',
-    border: '2px solid #444',
-    borderRadius: '12px',
-    cursor: 'pointer',
-    transition: 'all 0.2s ease',
-    color: '#fff',
-  },
-  selectedMove: {
-    borderColor: '#4a90e2',
-    backgroundColor: '#3a3a3a',
-  },
-  disabledMove: {
-    opacity: 0.5,
-    cursor: 'not-allowed',
-  },
-  moveEmoji: {
-    fontSize: '3rem',
-    marginBottom: '0.5rem',
-  },
-  moveName: {
-    fontSize: '1rem',
-  },
   winCondition: {
     color: '#666',
     fontSize: '0.9rem',
@@ -881,15 +891,6 @@ const styles = {
     color: '#fff',
     fontSize: '0.9rem',
   },
-  chatSendButton: {
-    padding: '0.5rem 1rem',
-    backgroundColor: '#4a90e2',
-    border: 'none',
-    borderRadius: '4px',
-    color: '#fff',
-    cursor: 'pointer',
-    fontSize: '0.9rem',
-  },
   waitingText: {
     fontSize: '1.2rem',
     color: '#aaa',
@@ -912,33 +913,6 @@ const styles = {
     gap: '1rem',
     justifyContent: 'center',
     marginBottom: '1rem',
-  },
-  playAgainButton: {
-    padding: '1rem 2rem',
-    fontSize: '1.2rem',
-    backgroundColor: '#28a745',
-    border: 'none',
-    borderRadius: '8px',
-    color: '#fff',
-    cursor: 'pointer',
-  },
-  playAgainButtonDisabled: {
-    padding: '1rem 2rem',
-    fontSize: '1.2rem',
-    backgroundColor: '#555',
-    border: 'none',
-    borderRadius: '8px',
-    color: '#888',
-    cursor: 'not-allowed',
-  },
-  backToLobbyButton: {
-    padding: '1rem 2rem',
-    fontSize: '1.2rem',
-    backgroundColor: '#6c757d',
-    border: 'none',
-    borderRadius: '8px',
-    color: '#fff',
-    cursor: 'pointer',
   },
   playAgainHint: {
     fontSize: '0.85rem',

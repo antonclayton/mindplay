@@ -195,7 +195,7 @@ function handleMessage(ws, message, wss) {
           games.set(lobby.id, game);
           
           const playersArray = Array.from(lobby.players.values());
-          playersArray.forEach(async (player, index) => {
+          const gameStartPromises = playersArray.map(async (player, index) => {
             const opponentIndex = index === 0 ? 1 : 0;
             const opponent = playersArray[opponentIndex];
             
@@ -223,9 +223,14 @@ function handleMessage(ws, message, wss) {
             }
           });
           
-          startRoundTimer(lobby.id);
-          lobby.players.forEach((p) => {
-            p.ws.send(JSON.stringify({ type: 'ROUND_TIMER_START', seconds: 30 }));
+          Promise.all(gameStartPromises).then(() => {
+            // Small delay to ensure frontend Game component is mounted and ready
+            setTimeout(() => {
+              startRoundTimer(lobby.id);
+              lobby.players.forEach((p) => {
+                p.ws.send(JSON.stringify({ type: 'ROUND_TIMER_START', seconds: 30 }));
+              });
+            }, 500);
           });
           
           broadcastPublicLobbies(wss);
@@ -323,12 +328,15 @@ function handleMessage(ws, message, wss) {
             
             games.delete(ws.lobbyId);
           } else {
-            startRoundTimer(ws.lobbyId);
-            if (lobby) {
-              lobby.players.forEach((p) => {
-                p.ws.send(JSON.stringify({ type: 'ROUND_TIMER_START', seconds: 30 }));
-              });
-            }
+            // Delay timer start by 5 seconds to allow round result display
+            setTimeout(() => {
+              startRoundTimer(ws.lobbyId);
+              if (lobby) {
+                lobby.players.forEach((p) => {
+                  p.ws.send(JSON.stringify({ type: 'ROUND_TIMER_START', seconds: 30 }));
+                });
+              }
+            }, 5000);
           }
         }
         break;
