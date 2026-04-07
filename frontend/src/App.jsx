@@ -6,6 +6,7 @@ import { Dashboard } from './pages/Dashboard';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { Lobby } from './pages/Lobby';
+import { Game } from './pages/Game';
 
 function App() {
   return (
@@ -20,6 +21,10 @@ function App() {
             <Route
               path="/lobby"
               element={<ProtectedRoute><Lobby /></ProtectedRoute>}
+            />
+            <Route
+              path="/game"
+              element={<ProtectedRoute><Game /></ProtectedRoute>}
             />
           </Routes>
         </div>

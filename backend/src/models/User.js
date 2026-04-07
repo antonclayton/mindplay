@@ -13,6 +13,20 @@ const userSchema = new mongoose.Schema(
       required: true,
       select: false,
     },
+    stats: {
+      totalGames: { type: Number, default: 0 },
+      wins: { type: Number, default: 0 },
+      losses: { type: Number, default: 0 },
+      draws: { type: Number, default: 0 },
+      rockThrows: { type: Number, default: 0 },
+      paperThrows: { type: Number, default: 0 },
+      scissorsThrows: { type: Number, default: 0 },
+    },
+    lastMoves: {
+      type: [String],
+      default: [],
+      validate: [arr => arr.length <= 7, 'lastMoves cannot exceed 7 items'],
+    },
   },
   { timestamps: true }
 );

@@ -1,10 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import useGameStore from '../stores/gameStore';
 
 const WEBSOCKET_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:5000';
 
 export function Lobby() {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const { setWs: setGameWs, setOpponent, setOpponentStats, setOpponentLastMoves, setIsHost, startNewGame } = useGameStore();
+  const navigatingToGameRef = useRef(false);
   const [players, setPlayers] = useState([]);
   const [lobbyId, setLobbyId] = useState(null);
   const [hostId, setHostId] = useState(null);
@@ -50,7 +55,14 @@ export function Lobby() {
           setPlayers([]);
           break;
         case 'GAME_STARTING':
-          alert('The game is starting!');
+          navigatingToGameRef.current = true;
+          startNewGame();
+          setGameWs(socket);
+          setIsHost(message.isHost);
+          setOpponent({ id: message.opponent.id, username: message.opponent.username });
+          setOpponentStats(message.opponent.stats);
+          setOpponentLastMoves(message.opponent.lastMoves || []);
+          navigate('/game');
           break;
         case 'ERROR':
           setError(message.message);
@@ -59,8 +71,12 @@ export function Lobby() {
     };
 
     setWs(socket);
-    return () => socket.close();
-  }, []);
+    return () => {
+      if (!navigatingToGameRef.current) {
+        socket.close();
+      }
+    };
+  }, [navigate, setGameWs, setOpponent, setOpponentStats, setOpponentLastMoves, setIsHost, startNewGame]);
 
   const handleCreateLobby = () => {
     if (ws) ws.send(JSON.stringify({ type: 'CREATE_LOBBY' }));
