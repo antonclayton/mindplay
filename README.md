@@ -1,17 +1,32 @@
 # Mindplay
 
-CS160 Sec02 Project - A web-based game with user authentication.
+A real-time multiplayer Rock Paper Scissors game with competitive stats tracking, built with React and WebSocket technology.
+
+## About the Game
+
+Mindplay is a modern take on the classic Rock Paper Scissors game, featuring:
+- **Real-time multiplayer** gameplay via WebSocket connections
+- **Competitive scoring** - First to 3 rounds wins
+- **Player statistics** tracking (wins, losses, move preferences)
+- **Move history** - See your opponent's last 7 moves
+- **Live chat** during matches
+- **Public/Private lobbies** for flexible matchmaking
+- **30-second round timers** to keep games moving
 
 ## Tech Stack
 
 **Frontend:**
-- React + Vite
+- React 18 + Vite
+- React Router for navigation
+- Zustand for state management
+- WebSocket for real-time communication
 - Running on `http://localhost:5173`
 
 **Backend:**
 - Node.js + Express
-- MongoDB + Mongoose
+- MongoDB + Mongoose for data persistence
 - JWT Authentication
+- WebSocket (ws) for real-time game state
 - Running on `http://localhost:5000`
 
 ## Project Structure
@@ -187,20 +202,108 @@ The application uses a real-time WebSocket-based lobby system for multiplayer ga
 - **Player List**: Shows all connected players (max 2)
 - **Host Indicator**: The lobby creator is marked as "(Host)"
 - **Privacy Controls**: Host can toggle between public/private at any time
-- **Start Game**: Host can start the game when ready (feature in development)
+- **Start Game**: Host can start the game when 2 players are present
 - **Leave Lobby**: Any player can leave the lobby at any time
 
-#### WebSocket Communication
+### Gameplay Flow
 
-The lobby system uses WebSocket connections for real-time updates:
+Once the host starts the game with 2 players, the real-time Rock Paper Scissors match begins:
+
+#### Game Interface
+
+The game screen is divided into three panels:
+
+**Left Panel - Opponent Intel:**
+- Opponent's username
+- Lifetime statistics (total games, wins, losses, win rate)
+- Move preferences (rock/paper/scissors throw percentages)
+- Last 7 moves history
+- Leave Game (Forfeit) button
+
+**Center Panel - Game Area:**
+- Current score display (You vs Opponent)
+- Round result display with move emojis
+- Three move buttons: Rock ✊, Paper ✋, Scissors ✌️
+- 30-second round timer
+- 5-second countdown between rounds
+
+**Right Panel - Match History & Chat:**
+- Visual history of all rounds played this match
+- Live chat with your opponent
+- Move indicators showing what each player threw
+
+#### Round Flow
+
+1. **Round Start**: 30-second timer begins
+2. **Move Selection**: Both players select rock, paper, or scissors
+3. **Move Submission**: Click your chosen move to lock it in
+4. **Waiting**: "Waiting for opponent..." message appears
+5. **Round Result**: Both moves are revealed simultaneously
+   - Win: Your move beats opponent's move
+   - Lose: Opponent's move beats your move
+   - Draw: Both players chose the same move
+6. **Score Update**: Winner gets 1 point (draws award no points)
+7. **5-Second Countdown**: Brief pause showing the result
+8. **Next Round**: New 30-second timer starts automatically
+
+#### Winning the Game
+
+- **Victory Condition**: First player to win 3 rounds wins the match
+- **Game Over Screen**: Displays final score and match statistics
+- **Play Again**: Host can request a rematch
+  - Opponent receives "Play Again?" prompt
+  - If accepted, a new game starts immediately
+  - Stats from previous game are saved
+- **Back to Lobby**: Return to lobby browser to find a new opponent
+
+#### Special Situations
+
+**Round Timeout:**
+- If a player doesn't submit a move within 30 seconds, they automatically lose that round
+- The opponent who submitted a move wins the round
+
+**Forfeit:**
+- Any player can leave the game at any time using "Leave Game (Forfeit)"
+- The leaving player receives a loss
+- The remaining player receives a win
+- Both players are returned to the lobby browser
+- Stats are updated immediately
+
+**Chat:**
+- Send messages to your opponent during the match
+- Messages appear in real-time in the right panel
+- Chat history is preserved for the duration of the match
+
+#### Statistics Tracking
+
+After each game (win, loss, or forfeit), the following stats are updated:
+- Total games played
+- Wins / Losses / Draws
+- Win rate percentage
+- Rock throws count
+- Paper throws count
+- Scissors throws count
+- Last 7 moves (visible to future opponents)
+
+These stats are displayed to opponents in future matches, allowing for strategic gameplay based on move patterns.
+
+## WebSocket Communication
+
+The application uses WebSocket connections for real-time updates:
 - Instant player join/leave notifications
 - Live lobby privacy status changes
 - Automatic public lobby list refresh
-- Host migration on disconnect
+- Real-time move submissions and round results
+- Live chat messages
+- Game state synchronization
 
 ## Testing
 
-See `backend/README.md` for detailed API testing instructions with Postman.
+See `backend/README.md` for detailed API testing instructions.
+
+For detailed frontend and backend documentation, see:
+- `frontend/README.md` - Frontend architecture and components
+- `backend/README.md` - API endpoints and WebSocket messages
 
 ## License
 
