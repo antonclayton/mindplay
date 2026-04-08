@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import useGameStore from '../stores/gameStore';
+import { Button } from '../components/Button';
 
 const WEBSOCKET_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:5000';
 
@@ -119,7 +120,7 @@ export function Lobby() {
             <div style={styles.box}>
               <h2 style={styles.boxTitle}>Create a Lobby</h2>
               <p style={styles.boxDescription}>Start a new public lobby and invite a friend.</p>
-              <button onClick={handleCreateLobby} style={styles.button}>Create Lobby</button>
+              <Button onClick={handleCreateLobby}>Create Lobby</Button>
             </div>
             <div style={styles.box}>
               <h2 style={styles.boxTitle}>Join a Lobby</h2>
@@ -132,7 +133,7 @@ export function Lobby() {
                   placeholder="Enter Lobby Code"
                   style={styles.input}
                 />
-                <button type="submit" style={styles.button}>Join Lobby</button>
+                <Button type="submit">Join Lobby</Button>
               </form>
             </div>
           </div>
@@ -149,7 +150,7 @@ export function Lobby() {
                     </div>
                     <div style={styles.lobbyActions}>
                       <span style={styles.playerCount}>{lobby.playerCount}/2 Players</span>
-                      <button onClick={() => handleJoinLobby(lobby.id)} style={styles.joinButton}>Join</button>
+                      <Button onClick={() => handleJoinLobby(lobby.id)} variant="primary" fullWidth={false} style={{ padding: '0.5rem 1rem', fontSize: '1rem' }}>Join</Button>
                     </div>
                   </div>
                 ))
@@ -172,9 +173,9 @@ export function Lobby() {
       
       {isHost && (
         <div style={styles.privacyContainer}>
-          <button onClick={handleTogglePrivacy} style={{...styles.button, ...styles.privacyButton}}>
+          <Button onClick={handleTogglePrivacy} variant="secondary" fullWidth={false} style={{ padding: '0.75rem 1.5rem', fontSize: '1.1rem' }}>
             Make {isPublic ? 'Private' : 'Public'}
-          </button>
+          </Button>
           <div style={{
             ...styles.privacyStatus,
             ...(isPublic ? styles.publicStatus : styles.privateStatus)
@@ -194,20 +195,19 @@ export function Lobby() {
       </div>
       <div style={styles.controls}>
         {isHost && (
-          <button 
+          <Button 
             onClick={handleStartGame} 
-            disabled={players.length !== 2} 
-            style={{
-              ...styles.button, 
-              ...(players.length !== 2 ? styles.disabledButton : {}),
-            }}
+            disabled={players.length !== 2}
+            variant="success"
+            fullWidth={false}
+            style={{ padding: '0.75rem 1.5rem', fontSize: '1.1rem' }}
           >
             Start Game
-          </button>
+          </Button>
         )}
-        <button onClick={handleLeaveLobby} style={{...styles.button, ...styles.leaveButton}}>
+        <Button onClick={handleLeaveLobby} variant="danger" fullWidth={false} style={{ padding: '0.75rem 1.5rem', fontSize: '1.1rem' }}>
           Leave Lobby
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -223,17 +223,13 @@ const styles = {
   boxDescription: { color: '#aaa', marginBottom: '1.5rem', flexGrow: 1 },
   joinForm: { display: 'flex', flexDirection: 'column', gap: '1rem' },
   input: { padding: '0.75rem', fontSize: '1.1rem', backgroundColor: '#2a2a2a', border: '1px solid #444', borderRadius: '4px', color: '#fff' },
-  button: { padding: '0.75rem 1.5rem', fontSize: '1.1rem', cursor: 'pointer', border: 'none', borderRadius: '4px', backgroundColor: '#4a90e2', color: '#fff' },
-  leaveButton: { backgroundColor: '#c94c4c' },
   error: { color: '#ff6b6b', marginTop: '1.5rem', fontWeight: 'bold'},
   subtitle: { fontSize: '1.5rem', marginBottom: '1rem', color: '#aaa' },
   instructions: { color: '#888', fontSize: '1rem', marginBottom: '2rem', marginTop: '-0.5rem' },
   playerList: { display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center', marginBottom: '2rem', width: '100%', maxWidth: '500px' },
   playerItem: { padding: '1rem', fontSize: '1.2rem', backgroundColor: '#2a2a2a', borderRadius: '8px', width: '100%' },
   controls: { display: 'flex', flexDirection: 'row', justifyContent: 'center', gap: '1rem', alignItems: 'center', marginTop: '2rem' },
-  disabledButton: { backgroundColor: '#555', opacity: 0.6, cursor: 'not-allowed' },
   privacyContainer: { display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '2rem' },
-  privacyButton: { backgroundColor: '#6a6a6a' },
   privacyStatus: { marginTop: '0.5rem', fontStyle: 'italic', fontWeight: 'bold', fontSize: '1.1rem' },
   publicStatus: { color: '#28a745' },
   privateStatus: { color: '#c94c4c' },
@@ -245,5 +241,4 @@ const styles = {
   hostName: { color: '#aaa', fontSize: '0.9rem' },
   lobbyActions: { display: 'flex', alignItems: 'center', gap: '1rem' },
   playerCount: { color: '#aaa', fontSize: '0.9rem' },
-  joinButton: { padding: '0.5rem 1rem', fontSize: '1rem', cursor: 'pointer', border: 'none', borderRadius: '4px', backgroundColor: '#3c82f6', color: '#fff' },
 };
