@@ -7,6 +7,8 @@ import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { Lobby } from './pages/Lobby';
 import { Game } from './pages/Game';
+import { Stats } from './pages/Stats';
+import { Leaderboard } from './pages/Leaderboard';
 
 function App() {
   return (
@@ -26,6 +28,11 @@ function App() {
               path="/game"
               element={<ProtectedRoute><Game /></ProtectedRoute>}
             />
+            <Route
+              path="/stats"
+              element={<ProtectedRoute><Stats /></ProtectedRoute>}
+            />
+            <Route path="/leaderboard" element={<Leaderboard />} />
           </Routes>
         </div>
       </AuthProvider>

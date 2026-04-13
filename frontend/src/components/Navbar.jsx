@@ -18,8 +18,14 @@ export function Navbar() {
           MindPlay
         </Link>
         <div style={styles.links}>
+          <Link to="/leaderboard" style={styles.link}>
+            Leaderboard
+          </Link>
           {user ? (
             <>
+              <Link to="/stats" style={styles.link}>
+                My Stats
+              </Link>
               <span style={styles.username}>@{user.username}</span>
               <Button onClick={handleLogout} variant="secondary" fullWidth={false} style={{ padding: '0.5rem 1rem', fontSize: '1rem' }}>
                 Logout
