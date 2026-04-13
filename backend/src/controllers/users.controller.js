@@ -44,6 +44,20 @@ export const updateMyStats = async (req, res, next) => {
       user.stats.rockThrows += stats.rockThrows || 0;
       user.stats.paperThrows += stats.paperThrows || 0;
       user.stats.scissorsThrows += stats.scissorsThrows || 0;
+
+      if (stats.wins > 0) {
+        user.stats.currentStreak = user.stats.currentStreak < 0
+          ? 1 : user.stats.currentStreak + 1;
+      } else if (stats.losses > 0) {
+        user.stats.currentStreak = user.stats.currentStreak > 0
+          ? -1 : user.stats.currentStreak - 1;
+      } else if (stats.draws > 0) {
+        user.stats.currentStreak = 0;
+      }
+
+      if (user.stats.currentStreak > (user.stats.bestStreak ?? 0)) {
+        user.stats.bestStreak = user.stats.currentStreak;
+      }
     }
 
     if (newMoves && Array.isArray(newMoves)) {

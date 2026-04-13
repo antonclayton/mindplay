@@ -21,6 +21,8 @@ const userSchema = new mongoose.Schema(
       rockThrows: { type: Number, default: 0 },
       paperThrows: { type: Number, default: 0 },
       scissorsThrows: { type: Number, default: 0 },
+      currentStreak: { type: Number, default: 0 },
+      bestStreak: { type: Number, default: 0 },
     },
     lastMoves: {
       type: [String],

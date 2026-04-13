@@ -45,4 +45,8 @@ export const api = {
     localStorage.removeItem('token');
     return Promise.resolve();
   },
+
+  getMyStats: () => request('/api/users/me/stats'),
+
+  getLeaderboard: () => request('/api/leaderboard'),
 };
