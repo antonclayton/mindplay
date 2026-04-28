@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import useGameStore from '../stores/gameStore';
 import { Button } from '../components/Button';
 import { MoveButton } from '../components/MoveButton';
+import { Hand, Circle, Scissors } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -260,11 +261,12 @@ export function Game() {
     ? opponentStats.rockThrows + opponentStats.paperThrows + opponentStats.scissorsThrows
     : 0;
 
-  const getMoveEmoji = (move) => {
+  const getMoveIcon = (move) => {
+    const iconProps = { size: 48, strokeWidth: 2 };
     switch (move) {
-      case 'rock': return '🪨';
-      case 'paper': return '📄';
-      case 'scissors': return '✂️';
+      case 'rock': return <Circle {...iconProps} fill="currentColor" />;
+      case 'paper': return <Hand {...iconProps} />;
+      case 'scissors': return <Scissors {...iconProps} />;
       default: return '❓';
     }
   };
@@ -336,7 +338,7 @@ export function Game() {
             {opponentStats && totalThrows > 0 ? (
               <div style={styles.percentages}>
                 <div style={styles.percentageItem}>
-                  <span style={styles.moveLabel}>🪨 Rock</span>
+                  <span style={styles.moveLabel}><Circle size={16} strokeWidth={2} fill="currentColor" style={{marginRight: '0.5rem'}} /> Rock</span>
                   <div style={styles.percentageBar}>
                     <div
                       style={{
@@ -351,7 +353,7 @@ export function Game() {
                   </span>
                 </div>
                 <div style={styles.percentageItem}>
-                  <span style={styles.moveLabel}>📄 Paper</span>
+                  <span style={styles.moveLabel}><Hand size={16} strokeWidth={2} style={{marginRight: '0.5rem'}} /> Paper</span>
                   <div style={styles.percentageBar}>
                     <div
                       style={{
@@ -366,7 +368,7 @@ export function Game() {
                   </span>
                 </div>
                 <div style={styles.percentageItem}>
-                  <span style={styles.moveLabel}>✂️ Scissors</span>
+                  <span style={styles.moveLabel}><Scissors size={16} strokeWidth={2} style={{marginRight: '0.5rem'}} /> Scissors</span>
                   <div style={styles.percentageBar}>
                     <div
                       style={{
@@ -437,7 +439,7 @@ export function Game() {
                   {roundResult.result === 'draw' && '🤝 Draw!'}
                 </p>
                 <p style={styles.movesText}>
-                  You: {getMoveEmoji(roundResult.myMove)} vs {getMoveEmoji(roundResult.opponentMove)} :Opponent
+                  You: {getMoveIcon(roundResult.myMove)} vs {getMoveIcon(roundResult.opponentMove)} :Opponent
                 </p>
                 {roundCountdown !== null && (
                   <p style={styles.countdownText}>Next round in {roundCountdown}...</p>
@@ -466,7 +468,7 @@ export function Game() {
                       onClick={() => handleMove(move)}
                       disabled={waitingForOpponent}
                       selected={selectedMove === move}
-                      emoji={getMoveEmoji(move)}
+                      emoji={getMoveIcon(move)}
                     />
                   ))}
                 </div>
@@ -488,7 +490,7 @@ export function Game() {
                       ...styles.moveIconLarge,
                       ...(index === opponentLastMoves.length - 1 ? styles.latestMove : {})
                     }} title={move}>
-                      {getMoveEmoji(move)}
+                      {getMoveIcon(move)}
                     </span>
                   </div>
                 ))

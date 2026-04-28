@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
+import { Hand, Circle, Scissors } from 'lucide-react';
 
 export function Stats() {
   const { user } = useAuth();
@@ -124,12 +125,12 @@ export function Stats() {
           ) : (
             <div style={styles.bars}>
               {[
-                { label: '🪨 Rock', count: stats.rockThrows },
-                { label: '📄 Paper', count: stats.paperThrows },
-                { label: '✂️ Scissors', count: stats.scissorsThrows },
-              ].map(({ label, count }) => (
+                { label: 'Rock', icon: <Circle size={16} strokeWidth={2} fill="currentColor" />, count: stats.rockThrows },
+                { label: 'Paper', icon: <Hand size={16} strokeWidth={2} />, count: stats.paperThrows },
+                { label: 'Scissors', icon: <Scissors size={16} strokeWidth={2} />, count: stats.scissorsThrows },
+              ].map(({ label, icon, count }) => (
                 <div key={label} style={styles.barRow}>
-                  <span style={styles.barLabel}>{label}</span>
+                  <span style={styles.barLabel}>{icon} {label}</span>
                   <div style={styles.barTrack}>
                     <div
                       style={{
@@ -241,6 +242,9 @@ const styles = {
   barLabel: {
     width: '110px',
     fontSize: '0.95rem',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem',
   },
   barTrack: {
     flex: 1,
