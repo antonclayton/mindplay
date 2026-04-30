@@ -181,14 +181,15 @@ export function Game() {
 
   const updateForfeitStats = async (result) => {
     const token = localStorage.getItem('token');
+    const sessionStats = getSessionStats();
     const stats = {
       totalGames: 1,
       wins: result === 'win' ? 1 : 0,
       losses: result === 'lose' ? 1 : 0,
       draws: 0,
-      rockThrows: 0,
-      paperThrows: 0,
-      scissorsThrows: 0,
+      rockThrows: sessionStats.rockThrows,
+      paperThrows: sessionStats.paperThrows,
+      scissorsThrows: sessionStats.scissorsThrows,
     };
     const newMoves = getMyMovesThisGame();
     try {
