@@ -15,7 +15,9 @@ Express + MongoDB backend for Mindplay Rock Paper Scissors game with JWT authent
    ```
    
    Edit `.env` and set:
-   - `MONGODB_URI` - your MongoDB connection string
+   - `MONGODB_URI` - your MongoDB connection string (local or cloud)
+     - Local: `mongodb://127.0.0.1:27017/mindplay`
+     - MongoDB Atlas Cloud: `mongodb+srv://username:password@cluster.mongodb.net/mindplay?retryWrites=true&w=majority`
    - `JWT_SECRET` - a secure random string for signing tokens
    - `PORT` - server port (default: 5000)
    - `CLIENT_ORIGIN` - frontend URL (default: http://localhost:5173)
@@ -100,6 +102,33 @@ backend/
 
 - `GET /api/users/:userId/stats` - Get another user's stats
   Response: `{ username, stats }`
+
+### Leaderboard Routes (Protected)
+
+- `GET /api/leaderboard` - Get top 20 players with 5+ games
+  Response: 
+  ```json
+  {
+    "leaderboard": [
+      {
+        "rank": 1,
+        "username": "player1",
+        "score": 15.67,
+        "wins": 20,
+        "losses": 10,
+        "draws": 0,
+        "totalGames": 30,
+        "winRate": 0.67
+      }
+    ]
+  }
+  ```
+  
+**Score Calculation:**
+```javascript
+score = wins * (totalGames / (totalGames + 10))
+```
+This formula balances win count with game volume, preventing players with few games from dominating the leaderboard.
 
 ## WebSocket API
 

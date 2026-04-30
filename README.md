@@ -287,6 +287,57 @@ After each game (win, loss, or forfeit), the following stats are updated:
 
 These stats are displayed to opponents in future matches, allowing for strategic gameplay based on move patterns.
 
+### Stats & Leaderboard
+
+#### Personal Stats Page
+
+Track your performance with detailed statistics accessible from the navbar:
+
+- **Record**: Total games, wins, losses, draws, and win rate percentage
+- **Streaks**: Current streak (W/L) and best winning streak
+  - Green indicator for win streaks (e.g., "5W")
+  - Red indicator for loss streaks (e.g., "3L")
+- **Move Distribution**: Visual bar charts showing rock/paper/scissors usage percentages
+  - Uses Lucide React icons for consistent visual representation
+  - Displays actual throw counts and percentages
+- **Last 7 Moves**: Historical record of your most recent moves across all games
+
+**Behavior:**
+- Stats update in real-time after each game completion
+- Forfeit games count toward stats (win/loss + all moves played)
+- All moves thrown during a game are tracked, even if the game ends early
+- Move history is capped at 7 most recent moves
+
+#### Leaderboard
+
+Competitive ranking system showing the top 20 players:
+
+- **Eligibility**: Minimum 5 games played to appear on leaderboard
+- **Score Calculation**: 
+  ```
+  score = wins × (totalGames / (totalGames + 10))
+  ```
+  - Rewards both winning and playing more games
+  - Prevents new players with lucky wins from dominating
+  - Scaling factor approaches 1.0 as games played increases
+  - Example: 20 wins in 30 games = 20 × (30/40) = 15.0 score
+  
+- **Sorting**: Ranked by score (descending), then wins, then total games
+- **Display**: Shows rank, username, score, W/L/D, games played, and win rate
+  - Top 3 positions marked with medals: 🥇 🥈 🥉
+  - Your entry is highlighted in blue if you're on the leaderboard
+  - "You" badge appears next to your username
+- **Color Coding**: Wins in green, losses in red for easy scanning
+
+#### Move Tracking System
+
+The game comprehensively tracks all moves (rock/paper/scissors) thrown during gameplay:
+- Moves are counted immediately when submitted during a round
+- Move history (last 7 moves) is saved to your profile after each game
+- Move distribution percentages are calculated from lifetime totals
+- Opponent's move preferences and last 7 moves are displayed during matches for strategic advantage
+- Forfeit games still count all moves played up to that point
+
 ## WebSocket Communication
 
 The application uses WebSocket connections for real-time updates:

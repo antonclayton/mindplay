@@ -44,7 +44,9 @@ frontend/
 │   │   ├── Login.jsx        # Login form
 │   │   ├── Register.jsx     # Registration form
 │   │   ├── Lobby.jsx        # Lobby management
-│   │   └── Game.jsx         # Main game interface
+│   │   ├── Game.jsx         # Main game interface
+│   │   ├── Stats.jsx        # Personal statistics page
+│   │   └── Leaderboard.jsx  # Competitive rankings
 │   ├── stores/          # Zustand state management
 │   │   └── gameStore.js     # Game state store
 │   ├── App.jsx          # Root component with routing
@@ -57,6 +59,7 @@ frontend/
 - **React Router** - Client-side routing
 - **Zustand** - Lightweight state management
 - **Vite** - Build tool and dev server
+- **Lucide React** - Icon library for consistent UI elements
 - **WebSocket** - Real-time communication
 
 ## Components
@@ -152,6 +155,38 @@ Message types handled:
 - `GAME_OVER` - Show final results
 - `CHAT_MESSAGE` - Display chat message
 
+## Pages
+
+### Stats Page (`/stats`)
+
+Personal statistics dashboard showing:
+- Win/loss/draw record with color-coded values
+- Current and best win streaks
+- Move distribution bar charts with Lucide icons
+- Real-time data fetching from `/api/users/me/stats`
+
+**Key Features:**
+- Responsive card layout with blue theme (`#4a90e2`)
+- Visual progress bars for move percentages
+- Streak indicators (green for wins, red for losses)
+- Loading and error states
+- Icon integration: Circle (rock), Hand (paper), Scissors
+
+### Leaderboard Page (`/leaderboard`)
+
+Competitive ranking table displaying top 20 players:
+- Medal icons (🥇🥈🥉) for top 3 positions
+- Table columns: rank, player, score, W/L/D, games, win rate
+- Current user highlighting with blue background
+- Minimum 5 games requirement to appear
+
+**Key Features:**
+- Responsive table layout with gold theme (`#f39c12`)
+- Real-time data from `/api/leaderboard`
+- "You" badge for current user's row
+- Color-coded wins (green) and losses (red)
+- Score calculation displayed: `wins × (totalGames / (totalGames + 10))`
+
 ## Styling
 
 All styles use CSS-in-JS with inline style objects. Color scheme:
@@ -161,6 +196,7 @@ All styles use CSS-in-JS with inline style objects. Color scheme:
 - Primary: `#4a90e2` (blue)
 - Success: `#28a745` (green)
 - Danger: `#dc3545` / `#e74c3c` (red)
+- Warning: `#f39c12` (gold/orange)
 - Text: `#fff` / `#aaa`
 
 ## Development
