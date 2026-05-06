@@ -3,7 +3,6 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Input } from '../components/Input';
 import { Button } from '../components/Button';
-import { validateUsername, validatePassword } from '../utils/sanitize';
 
 export function Login() {
   const [username, setUsername] = useState('');
@@ -19,10 +18,7 @@ export function Login() {
     setLoading(true);
 
     try {
-      const sanitizedUsername = validateUsername(username);
-      const validatedPassword = validatePassword(password);
-
-      await login(sanitizedUsername, validatedPassword);
+      await login(username, password);
       navigate('/');
     } catch (err) {
       setError(err.message);
