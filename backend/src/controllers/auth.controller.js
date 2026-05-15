@@ -12,6 +12,15 @@ function signToken(userId) {
   return jwt.sign({ sub: userId }, env.JWT_SECRET, { expiresIn: '7d' });
 }
 
+export async function checkUsername(req, res, next) {
+  try {
+    const existing = await User.findOne({ username: req.query.username });
+    res.json({ available: !existing });
+  } catch (err) {
+    next(err);
+  }
+}
+
 export async function register(req, res, next) {
   try {
     const { username, password } = req.body;

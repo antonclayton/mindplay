@@ -4,33 +4,51 @@ import { useAuth } from '../context/AuthContext';
 import { Input } from '../components/Input';
 import { Button } from '../components/Button';
 import { validateUsername, validatePassword } from '../utils/sanitize';
+import { api } from '../utils/api';
 
 export function Register() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
+  const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setErrors([]);
     setLoading(true);
 
+    const allErrors = [];
+    let sanitizedUsername, validatedPassword;
+
+    try { sanitizedUsername = validateUsername(username); }
+    catch (err) { allErrors.push(err.message); }
+
+    try { validatedPassword = validatePassword(password); }
+    catch (err) { allErrors.push(err.message); }
+
+    if (password !== confirmPassword) allErrors.push('Passwords do not match');
+
+    if (sanitizedUsername) {
+      try {
+        const { available } = await api.checkUsername(sanitizedUsername);
+        if (!available) allErrors.push('Username already taken');
+      } catch { /* let register handle it */ }
+    }
+
+    if (allErrors.length > 0) {
+      setErrors(allErrors);
+      setLoading(false);
+      return;
+    }
+
     try {
-      if (password !== confirmPassword) {
-        throw new Error('Passwords do not match');
-      }
-
-      const sanitizedUsername = validateUsername(username);
-      const validatedPassword = validatePassword(password);
-
       await register(sanitizedUsername, validatedPassword);
       navigate('/');
     } catch (err) {
-      setError(err.message);
+      setErrors([err.message]);
     } finally {
       setLoading(false);
     }
@@ -47,7 +65,6 @@ export function Register() {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             placeholder="Choose a username"
-            required
           />
           <Input
             label="Password"
@@ -55,7 +72,6 @@ export function Register() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Choose a password"
-            required
           />
           <Input
             label="Confirm Password"
@@ -63,9 +79,14 @@ export function Register() {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             placeholder="Confirm your password"
-            required
           />
-          {error && <p style={styles.error}>{error}</p>}
+          {errors.length > 0 && (
+            <ul style={styles.errorList}>
+              {errors.map((err, i) => (
+                <li key={i} style={styles.error}>{err}</li>
+              ))}
+            </ul>
+          )}
           <Button type="submit" disabled={loading}>
             {loading ? 'Creating account...' : 'Register'}
           </Button>
@@ -103,11 +124,16 @@ const styles = {
     marginBottom: '1.5rem',
     textAlign: 'center',
   },
+  errorList: {
+    listStyle: 'none',
+    padding: 0,
+    margin: '0 0 1rem 0',
+  },
   error: {
     color: '#ff6b6b',
     fontSize: '0.9rem',
-    marginBottom: '1rem',
     textAlign: 'center',
+    marginBottom: '0.25rem',
   },
   footer: {
     marginTop: '1.5rem',

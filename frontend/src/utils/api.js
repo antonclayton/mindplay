@@ -27,6 +27,9 @@ async function request(endpoint, options = {}) {
 }
 
 export const api = {
+  checkUsername: (username) =>
+    request(`/api/auth/check-username?username=${encodeURIComponent(username)}`),
+
   register: (username, password) =>
     request('/api/auth/register', {
       method: 'POST',
